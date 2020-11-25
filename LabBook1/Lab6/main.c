@@ -5,6 +5,7 @@
 #include "xtimer.h"
 
 char stack[THREAD_STACKSIZE_MAIN];
+char stack2[THREAD_STACKSIZE_MAIN];
 
 void *_thread_handler(void *arg)
 {
@@ -21,12 +22,13 @@ void *_thread_handler(void *arg)
 void *_blink_handler(void *arg)
 {
     (void) arg;
+    xtimer_ticks32_t timer;
+    xtimer_init();
+    timer = xtimer_now();
     for(;;)
     {
-        LED0_ON;
-        xtimer_usleep(250000);
-        LED0_OFF;
-        xtimer_usleep(250000);
+        LED0_TOGGLE;
+        xtimer_periodic_wakeup(&timer , 500000);
     }    
     return NULL;
 }
@@ -45,9 +47,9 @@ int main(void)
                     NULL,
                     "_thread_handler");
     gpio_init(LED0_PIN, GPIO_OUT);
-    thread_create(      stack,
-                    sizeof(stack),
-                    THREAD_PRIORITY_MAIN + 1,
+    thread_create(      stack2,
+                    sizeof(stack2),
+                    THREAD_PRIORITY_MAIN +2,
                     THREAD_CREATE_WOUT_YIELD,
                     _blink_handler,
                     NULL,
