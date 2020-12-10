@@ -1,6 +1,6 @@
 APPLICATION=Lab2
 
-BOARD ?= native
+BOARD ?= nucleo-l073rz
 
 USEMODULE += shell
 USEMODULE += shell_commands
