@@ -9,16 +9,11 @@
 
 char stack[THREAD_STACKSIZE_MAIN];
 
-void *_thread_handler(void *arg)
+void _bp_callback(void *arg)
 {
     (void) arg;
-    for(;;)
-    {
-        gpio_write(LED2_PIN,gpio_read(BP1_PIN));
-    }    
-    return NULL;
+    gpio_toggle(LED2_PIN); 
 }
-
 
 static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
@@ -26,15 +21,9 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    thread_create(  stack,
-                    sizeof(stack),
-                    THREAD_PRIORITY_MAIN + 1,
-                    THREAD_CREATE_WOUT_YIELD,
-                    _thread_handler,
-                    NULL,
-                    "_thread_handler");
     gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_init(BP1_PIN, GPIO_IN);
+    gpio_init_int(BP1_PIN, GPIO_IN, GPIO_FALLING, _bp_callback, NULL);
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;

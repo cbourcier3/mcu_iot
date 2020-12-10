@@ -6,6 +6,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += xtimer
+USEMODULE += periph_gpio_irq
 
 FEATURES_REQUIRED += periph_gpio
 
