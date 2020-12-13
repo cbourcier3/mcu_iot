@@ -1,55 +1,46 @@
 #include <stdio.h>
 #include "board.h"
 #include "thread.h"
-#include "periph/gpio.h"
 #include "shell.h"
-#include "msg.h"
-#include "spi.h"
+#include "lib_max31855.h"
+int temp = 0;    
+unsigned char tempChar[4] = {0};
 
-#define LED2_PIN    GPIO_PIN(PORT_A, 5)
-#define BP1_PIN     GPIO_PIN(PORT_C, 13)
-
-char stack[THREAD_STACKSIZE_MAIN];
-msg_t rcv_queue[2];
-static kernel_pid_t rcv_pid;
-
-void _bp_callback(void *arg)
+int _temp_handler(int argc, char **argv)
 {
-    (void) arg;
-    msg_t msg;
-    msg.content.value = 1;
-    msg_try_send(&msg, rcv_pid); 
-}
-
-void *_led_toggle_handler(void *arg)
-{
-    (void) arg;
-    for(;;)
-    {
-        msg_t msg;
-        msg_receive(&msg);
-        gpio_toggle(LED2_PIN); 
-    }
+    (void) argc;
+    (void) argv;
+    max31855_init(SPI_PORT, SPI_CS_PIN);
+    max31855_readtemp(SPI_PORT, SPI_CS_PIN, tempChar);
+    float tempFloat = max31855_decodetemp(tempChar);
+    printf("%f\n",tempFloat);
+    return 0;
 }
 
 static const shell_command_t shell_commands[] = {
+    { "readtemp", "Read the temp from the max31855", _temp_handler },
     { NULL, NULL, NULL }
 };
 
 int main(void)
 {
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_init_int(BP1_PIN, GPIO_IN, GPIO_FALLING, _bp_callback, NULL);
-    msg_init_queue(rcv_queue, 2);
-
-    rcv_pid = thread_create(  stack,
-                    sizeof(stack),
-                    THREAD_PRIORITY_MAIN - 1,
-                    THREAD_CREATE_WOUT_YIELD,
-                    _led_toggle_handler,
-                    NULL,
-                    "_led_toggle_handler");
+    max31855_init(SPI_PORT, SPI_CS_PIN);
+    max31855_readtemp(SPI_PORT, SPI_CS_PIN, tempChar);
+    float tempFloat = max31855_decodetemp(tempChar);
+    printf("%f\n",tempFloat);
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
+
+/**
+    SPI: 
+    init
+        void    spi_init (spi_t bus)
+            Basic initialization of the given SPI bus
+        int     spi_init_cs (spi_t bus, spi_cs_t cs)
+            Initialize the given chip select pin.
+        int     spi_acquire (spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+            Start a new SPI transaction.
+
+*/

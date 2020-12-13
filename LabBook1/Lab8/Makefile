@@ -7,8 +7,8 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += xtimer
 USEMODULE += periph_gpio_irq
-
-FEATURES_REQUIRED += periph_gpio
+USEMODULE += periph_spi
+USEMODULE += printf_float
 
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
