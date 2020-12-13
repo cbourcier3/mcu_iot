@@ -22,7 +22,7 @@ int main(void)
 {
     thread_create(stack,
                         sizeof(stack),
-                        THREAD_PRIORITY_MIN,
+                        THREAD_PRIORITY_IDLE,
                         THREAD_CREATE_WOUT_YIELD,
                         _thread_handler,
                         NULL,

@@ -39,7 +39,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    thread_create(      stack,
+    thread_create(  stack,
                     sizeof(stack),
                     THREAD_PRIORITY_MAIN + 1,
                     THREAD_CREATE_WOUT_YIELD,
@@ -47,7 +47,7 @@ int main(void)
                     NULL,
                     "_thread_handler");
     gpio_init(LED0_PIN, GPIO_OUT);
-    thread_create(      stack2,
+    thread_create(  stack2,
                     sizeof(stack2),
                     THREAD_PRIORITY_MAIN +2,
                     THREAD_CREATE_WOUT_YIELD,
